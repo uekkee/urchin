@@ -76,13 +76,13 @@ class UniVisitor
   end
 
   def records_to_slack_message(records)
-    message = "New sale!\n"
-
+    sale = "```"
     records.each do |record|
-      message << "\n#{record[:time]}: #{record[:name]}@#{record[:price]} | \"#{record[:title]}\"@(#{record[:position]})"
+      sale << "\n#{record[:time]}: #{record[:name]}@#{record[:price]} | \"#{record[:title]}\"@(#{record[:position]})"
     end
+    sale << "\n```"
 
-    message
+    "<!here> New sale!\n#{sale}"
   end
 end
 
