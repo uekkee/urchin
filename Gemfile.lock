@@ -17,6 +17,7 @@ GEM
       xpath (~> 2.0)
     cliver (0.3.2)
     concurrent-ruby (1.0.5)
+    daemons (1.2.4)
     dotenv (2.2.1)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
@@ -63,6 +64,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 5.1.4)
   capybara (~> 2.15.3)
+  daemons (~> 1.2.4)
   dotenv (~> 2.2.1)
   poltergeist (~> 1.16.0)
   slack-ruby-client (~> 0.10.0)
