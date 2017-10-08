@@ -52,7 +52,7 @@ class UniVisitor
 
     @session.all(:xpath, element_query).each do |element|
       record = element_to_record(element)
-      break if record == latest_record
+      break if compare_records(latest_record, record) >= 0
       results << record
       break if latest_record.nil?
     end
@@ -73,6 +73,10 @@ class UniVisitor
         title:    element.find(:xpath, 'td[7]').text,
         position: element.find(:xpath, 'td[8]').text
     }
+  end
+
+  def compare_records(left, right)
+    left.try(:[], :time).to_s <=> right.try(:[], :time).to_s
   end
 
   def records_to_slack_message(records)
