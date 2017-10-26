@@ -34,7 +34,13 @@ class UniVisitor
   private
 
   def process_one_item(**params)
-    records = visit_and_find(**params)
+    records =
+      begin
+        visit_and_find(**params)
+      rescue
+        post_to_slack "browser access failure: `#{params[:item]}`"
+        return params[:latest_record]
+      end
     if records.any?
       post_to_slack(records_to_slack_message(records))
     else
@@ -54,7 +60,7 @@ class UniVisitor
 
     results = []
 
-    return results if @session.status_code != 200
+    fail 'HTTP status code is not valid' if @session.status_code != 200
 
     @session.all(:xpath, element_query).each do |element|
       record = element_to_record(element)
