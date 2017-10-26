@@ -19,23 +19,29 @@ class UniVisitor
     @slack_client = Slack::Web::Client.new
   end
 
-  def drive(world: nil, item: nil)
-    post_to_slack("Hello! This is urchin agent starting.\n World: `#{world}` , Item: `#{item}`")
+  def drive(world: nil, items: [], sleep_sec: 600)
+    post_to_slack("Hello! This is urchin agent starting.\n World: `#{world}` , Items: `#{items}`")
 
-    latest_record = nil
+    latest_records = Array.new(items.size)
     loop do
-      records = visit_and_find(world: world, item: item, latest_record: latest_record)
-
-      if records.any?
-        post_to_slack(records_to_slack_message(records))
-        latest_record = records.first
+      items.each_with_index do |item, index|
+        latest_records[index] = process_one_item(world: world, item: item, latest_record: latest_records[index])
       end
-
-      sleep 900
+      sleep sleep_sec
     end
   end
 
   private
+
+  def process_one_item(**params)
+    records = visit_and_find(**params)
+    if records.any?
+      post_to_slack(records_to_slack_message(records))
+    else
+      post_to_slack("no new record: `#{params[:item]}`")
+    end
+    records.first || params[:latest_record]
+  end
 
   def visit_and_find(world: nil, item: nil, latest_record: nil)
     host = ENV['HOST']
@@ -91,6 +97,7 @@ class UniVisitor
 end
 
 world = ENV['WORLD']
-item = ENV['ITEM']
+items = ENV['ITEMS'].split(',')
+sleep_sec = (ENV['SLEEP'] || 600).to_i
 
-UniVisitor.new.drive(world: world, item: item)
+UniVisitor.new.drive(world: world, items: items, sleep_sec: sleep_sec)
